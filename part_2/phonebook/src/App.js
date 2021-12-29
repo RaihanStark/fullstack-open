@@ -1,13 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Filter from "./Components/Filter";
 import AddNewPerson from "./Components/AddNewPerson";
 import Numbers from "./Components/Numbers";
+import axios from "axios";
 
 function App() {
-  const [persons, setPersons] = useState([
-    { id: 0, name: "Arto Hellas", number: "0851-5643-7222" },
-  ]);
+  const [persons, setPersons] = useState([]);
   const [filter, setFilter] = useState("");
+
+  useEffect(() => {
+    axios.get("http://localhost:3001/persons").then((response) => {
+      setPersons(response.data);
+    });
+  }, []);
 
   const addName = (newName, newNumber) => {
     const found = persons.find((person) => person.name === newName);
