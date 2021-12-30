@@ -1,6 +1,6 @@
 import React from "react";
 
-function Numbers({ persons, filter }) {
+function Numbers({ persons, filter, onDelete }) {
   const personsToShow =
     filter === ""
       ? persons
@@ -13,7 +13,8 @@ function Numbers({ persons, filter }) {
       {personsToShow.map((person) => {
         return (
           <div key={person.name}>
-            {person.name} {person.number}
+            {person.name} {person.number}{" "}
+            <button onClick={() => onDelete(person.id)}>delete</button>
           </div>
         );
       })}
