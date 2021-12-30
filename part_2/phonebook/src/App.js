@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 
 import axios from "axios";
 
+import "./index.css";
+import Notification from "./Components/Notification";
 import personService from "./services/persons";
 import Filter from "./Components/Filter";
 import AddNewPerson from "./Components/AddNewPerson";
@@ -10,6 +12,10 @@ import Numbers from "./Components/Numbers";
 function App() {
   const [persons, setPersons] = useState([]);
   const [filter, setFilter] = useState("");
+  const [notification, setNotification] = useState({
+    message: null,
+    type: null,
+  });
 
   useEffect(() => {
     personService.getAll().then((initialPerson) => {
@@ -59,6 +65,18 @@ function App() {
     personService.create(newPersonObject).then((returnedPersons) => {
       setPersons(persons.concat(returnedPersons));
     });
+
+    setNotification({
+      message: `${newName} added to phonebook`,
+      type: "success",
+    });
+
+    setTimeout(() => {
+      setNotification({
+        message: null,
+        type: null,
+      });
+    }, 5000);
   };
 
   const deleteNotesHandler = (id) => {
@@ -66,16 +84,25 @@ function App() {
       `Are you sure want to delete ${id}?`
     );
     if (deleteConfirmation) {
-      personService.deletePerson(id).then(() => {
-        setPersons(persons.filter((person) => person.id !== id));
-      });
+      personService
+        .deletePerson(id)
+        .then(() => {
+          setPersons(persons.filter((person) => person.id !== id));
+        })
+        .catch((error) => {
+          console.log(error);
+          setNotification({
+            message: `Person ${id} is already deleted from database`,
+            type: "error",
+          });
+        });
     }
   };
 
   return (
     <div>
       <h2>Phonebook</h2>
-
+      <Notification type={notification.type} message={notification.message} />
       <Filter filter={filter} setFilter={setFilter} />
       <AddNewPerson addName={addName} />
       <Numbers
